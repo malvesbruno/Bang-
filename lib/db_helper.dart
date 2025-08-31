@@ -1,18 +1,18 @@
-import 'dart:convert';
-
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
-
+// classe que lida com o banco de dados
 class DBHelper {
   static Database? _db;
 
+  // pega a database
   static Future<Database> get database async {
     if (_db != null) return _db!;
     _db = await _initDB('bangApp.db');
     return _db!;
   }
 
+  //inicia a database
   static Future<Database> _initDB(String filePath) async {
     final path = join(await getDatabasesPath(), filePath);
     return await openDatabase(
@@ -36,13 +36,15 @@ await db.execute('''
   avataresComprados TEXT,           
   revolveresComprados TEXT,
   gamertag TEXT,
-  avatar TEXT
+  avatar TEXT,
+  revolver TEXT
   )
 ''');
 
     // Crie outras tabelas aqui: atividades, stats, amigos etc.
   }
 
+  // atualiza a database
   static Future<void> insert(String table, Map<String, dynamic> data) async {
   final db = await database;
   await db.insert(
@@ -52,11 +54,13 @@ await db.execute('''
   );
 }
 
+  //pega tudo da database
   static Future<List<Map<String, dynamic>>> getAll(String table) async {
     final db = await database;
     return await db.query(table);
   }
 
+  // limpa a database
   static Future<void> clearTable(String table) async {
     final db = await database;
     await db.delete(table);

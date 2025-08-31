@@ -1,5 +1,3 @@
-import 'package:bang/main.dart';
-import 'package:bang/pages/bluetoothPreparePage.dart';
 import 'package:bang/pages/onlineWaitAnswerPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,8 +5,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../appdata.dart';
 import '../services/getAmigos.dart';
-import '../services/enviarConvites.dart';
+import '../services/nuvem.dart';
 
+
+//Página mostrar todos os amigos do user
 class AmigosPage extends StatefulWidget {
   const AmigosPage({super.key});
 
@@ -17,57 +17,60 @@ class AmigosPage extends StatefulWidget {
 }
 
 class _AmigosPageState extends State<AmigosPage> {
-  final AudioPlayer audioPlayer = AudioPlayer();
-  bool playin = AppData.mute == 0;
-  List<Map<String, dynamic>> ranking = [];
+  final AudioPlayer audioPlayer = AudioPlayer(); //cria a variavel AudioPlayer que é usada para tocar sons 
+  bool playin = AppData.mute == 0; // a variável playin determina se o audio vai tocar ou não
+  List<Map<String, dynamic>> ranking = []; // lista de ranking que vai ser alimentada posteriormente 
   int _currentIndex = 0; // começa do zero
   final int _pageSize = 10; // quantos amigos por vez
-  bool _hasMore = true;
+  bool _hasMore = true; // variável que define se há mais amigos além dos mostrados na tela
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    // determina que a tela do ceular fique de pé
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    // a variável playin determina se o audio vai tocar ou não
     playin = AppData.mute == 0;
+    // carrega todos os amigos do user
     _loadAmigos();
-    /* ranking.sort((a, b) {
-    int bountyA = int.parse(a['bounty']!);
-    int bountyB = int.parse(b['bounty']!);
-    return bountyB.compareTo(bountyA); // ordem decrescente
-  }); */
   }
 
+  // função que realiza o calculo para determinar o preço na cabeça do amigo
   String _getBounty(double qtVitoria, double qtDerrota, double qtEmpate){
-    final base = 20;
+    final base = 20; // base 20 para que não seja possível ter uma bounty abaixo de 20
     final v = qtVitoria;
   final d = qtDerrota;
   final e = qtEmpate;
 
+  // o preço é igual à base mais as vitórias multiplicadas 250 menos as derrotas multiplicadas por 100 menos os empates multiplicados por 50
+  // assim criamos um sistema que não se torna muito fácil, aumentando a atesão
   double bounty = base + (v * 250) - (d * 100) - (e * 50);
   bounty = bounty.clamp(0, 10000000); // mínimo 0, máximo 10 mil
-  return "${bounty.toStringAsFixed(2)}";
+  return "${bounty.toStringAsFixed(2)}"; // retorna em um string com dois números depois da virgula. Similar à comos usamos com dinheiro
   }
 
   Future<void> _loadAmigos({bool append = false}) async {
   // Se já carregou tudo, nem busca
   if (!_hasMore) return;
 
-  print('Amigos' '${AppData.amigos.toString()}');
-
+  // se o index atual mais a quantidade carregada agora não for maior que a lista de amigos, o final é igual ao index atual + a quantidade carregada
   final end = (_currentIndex + _pageSize) > AppData.amigos.length
       ? AppData.amigos.length
       : (_currentIndex + _pageSize);
 
+  // define a porção de amigos que são selecionados por vez
   final chunk = AppData.amigos.sublist(_currentIndex, end);
 
+  // pega a porção dos amigos salvos no banco 
   final amigosInfo = await getAmigosData(chunk);
   if (!mounted) return;
   setState(() {
+    //cria uma variável com as informações do amigo que posteriormente será adicionados à lista
     final novos = amigosInfo.map((amigo) => {
       "id": amigo['id'],
       "name": amigo['gamertag']?.toString() ?? "Sem nome",
@@ -81,15 +84,19 @@ class _AmigosPageState extends State<AmigosPage> {
     }).toList();
 
     if (append) {
+      // se há mais user do que a porção ele só adiciona ao ranking
       ranking.addAll(novos);
     } else {
+      // se não, ele passa essa lista para o ranking
       ranking = novos;
     }
-
+    // o index atual passa a ser o final
     _currentIndex = end;
+    // define se há mais, verificando se o index atual é menor que o tamanho da lista 
     _hasMore = _currentIndex < AppData.amigos.length;
   });
 
+  //retorna o ranking arrumado do maior para o menor
   ranking.sort((a, b) {
   final bountyA = double.tryParse(a['bounty'] ?? '0') ?? 0;
   final bountyB = double.tryParse(b['bounty'] ?? '0') ?? 0;
@@ -141,7 +148,6 @@ class _AmigosPageState extends State<AmigosPage> {
               Center(
                 child:  Stack(
   children: [
-    // Texto com contorno (usando Paint)
     Text(
       'Selecione um Amigo',
       textAlign: TextAlign.center,
@@ -154,7 +160,6 @@ class _AmigosPageState extends State<AmigosPage> {
           ..color = Color(0xFF4A251D),
       ),
     ),
-    // Texto preenchido
     Text(
       'Selecione um Amigo',
       textAlign: TextAlign.center,
@@ -179,6 +184,7 @@ class _AmigosPageState extends State<AmigosPage> {
       int total = ranking.length;
       double posPercent = (index + 1) / total; // posição percentual (1-based)
 
+      // define a periculosidade do user através da posição dele no ranking
       int stars;
       if (posPercent <= 0.10) {
         stars = 6;
@@ -187,7 +193,7 @@ class _AmigosPageState extends State<AmigosPage> {
       } else {
         stars = 1;
       }
-
+      // cria um modelo de elemento para os resultados 
       return customListTile(
         avatarPath: player['avatar']!,
         name: player['name']!,

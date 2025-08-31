@@ -1,6 +1,7 @@
 import 'package:sensors_plus/sensors_plus.dart';
 import 'dart:async';
 
+// classe que controla o movimento do celular
 class MotionService {
   static final MotionService _instance = MotionService._internal();
 

@@ -4,7 +4,7 @@ import '../pages/offlinePage.dart';
 import 'dart:async';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 
-
+// tela com um pequeno timer para que os users se preparem para o duelo
 class BluetoothPreparePage extends StatefulWidget {
   final QualifiedCharacteristic writeChar;
 
@@ -23,6 +23,7 @@ class _BluetoothPreparePageState extends State<BluetoothPreparePage> {
     startCountdown();
   }
 
+  //Cria um contador de um segundo para sincronizar os users
   void startCountdown() {
     Timer.periodic(Duration(seconds: 1), (timer) {
       setState(() {

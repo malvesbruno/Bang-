@@ -1,5 +1,7 @@
 import 'package:permission_handler/permission_handler.dart';
 
+
+// classe para pedir permissão de bluetooth
 class BluetoothPermission {
   static Future<void> requestBluetoothPermissions() async {
     final permissions = [

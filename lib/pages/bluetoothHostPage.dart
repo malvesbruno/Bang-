@@ -1,12 +1,16 @@
-import 'package:bang/pages/offlinePage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
-import '../pages/playingPage.dart';
-import 'package:app_settings/app_settings.dart';
 import '../pages/bluetoothLobbyPage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../pages/bluetoothPreparePage.dart';
+import '../widgets/tumbleWeed.dart';
 
+
+/// Página que representa o host Bluetooth do jogo.
+/// 
+/// Essa tela é responsável por procurar o cliente, tentar se conectar e 
+/// confirmar a sincronização inicial para que os jogadores possam 
+/// prosseguir para a preparação da partida.
 class BluetoothHostPage extends StatefulWidget {
   const BluetoothHostPage({super.key});
 
@@ -16,25 +20,27 @@ class BluetoothHostPage extends StatefulWidget {
 
 class _BluetoothHostPageState extends State<BluetoothHostPage> {
   final _ble = FlutterReactiveBle();
-  late DiscoveredDevice _connectedDevice;
-  late QualifiedCharacteristic _writeChar;
+  late DiscoveredDevice _connectedDevice; // Dispositivo conectado
+  late QualifiedCharacteristic _writeChar;  // Característica usada para enviar/receber dados
 
+  // UUIDs que identificam o serviço e a característica do jogo
   final Uuid serviceUuid = Uuid.parse("12345678-1234-5678-1234-56789abcdef0");
   final Uuid charUuid = Uuid.parse("abcdef01-1234-5678-1234-56789abcdef0");
 
-  bool _isAdvertising = false;
-  bool _deviceConnected = false;
-  bool _modoTeste = true;
+  bool _isAdvertising = false; // Indica se o host está escaneando
+  bool _deviceConnected = false; // Indica se já há um dispositivo conectado
+  bool _modoTeste = false; // Usado para simulação em testes
 
   Stream<DiscoveredDevice>? _advertisingStream;
 
-  bool _dialogShown = false;
+  bool _dialogShown = false;  // Evita abrir múltiplos diálogos de Bluetooth desligado
+
 
 @override
 void initState() {
   super.initState();
 
-  // Escuta continuamente o status do Bluetooth
+  // Monitora o status do Bluetooth
   _ble.statusStream.listen((status) {
     print("Status do Bluetooth: $status");
 
@@ -47,7 +53,7 @@ void initState() {
     }
   });
 
-  // Checa o status inicial depois que o build estiver completo
+  // Checa o status inicial após a renderização da tela
   WidgetsBinding.instance.addPostFrameCallback((_) async {
     final initialStatus = await _ble.statusStream.first;
     if (initialStatus == BleStatus.poweredOff) {
@@ -58,6 +64,7 @@ void initState() {
   });
 }
 
+/// Simula uma conexão bem-sucedida (modo de teste).
 void simularConexao() async {
   setState(() {
     _deviceConnected = true;
@@ -70,6 +77,7 @@ void simularConexao() async {
   }
 }
 
+/// Exibe um diálogo pedindo para ativar o Bluetooth.
 void _showBluetoothEnableDialog() {
   if (_dialogShown) return;
   _dialogShown = true;
@@ -108,6 +116,7 @@ void _showBluetoothEnableDialog() {
   );
 }
 
+  /// Inicia a varredura para encontrar o host via Bluetooth.
   void startAdvertising() {
   setState(() => _isAdvertising = true);
 
@@ -171,6 +180,7 @@ void _showBluetoothEnableDialog() {
   });
 }
 
+   /// Vai para a tela de preparação do jogo após conexão bem-sucedida.
   void _goToPreparationScreen() {
   if (mounted) {
     Navigator.pushReplacement(
@@ -249,7 +259,7 @@ Positioned.fill(
               SizedBox(
                 width: 150,
                 height: 200,
-                child: _AnimatedTumbleweedWithShadow(),
+                child: AnimatedTumbleweedWithShadow(),
               ),
              
               if (_modoTeste)
@@ -286,101 +296,3 @@ Positioned.fill(
 }
 }
 
-class _AnimatedTumbleweedWithShadow extends StatefulWidget {
-  @override
-  State<_AnimatedTumbleweedWithShadow> createState() => _AnimatedTumbleweedWithShadowState();
-}
-
-class _AnimatedTumbleweedWithShadowState extends State<_AnimatedTumbleweedWithShadow>
-    with TickerProviderStateMixin {
-  late AnimationController _rotationController;
-  late AnimationController _bounceController;
-  late Animation<double> _bounceAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _rotationController = AnimationController(
-      vsync: this,
-      duration: Duration(seconds: 2),
-    )..repeat();
-
-    _bounceController = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 1000),
-    )..repeat(reverse: true);
-
-    _bounceAnimation = Tween<double>(begin: 0, end: -35).animate(
-      CurvedAnimation(parent: _bounceController, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _rotationController.dispose();
-    _bounceController.dispose();
-    super.dispose();
-  }
-
- @override
-Widget build(BuildContext context) {
-  return AnimatedBuilder(
-    animation: Listenable.merge([_rotationController, _bounceAnimation]),
-    builder: (context, child) {
-      double bounceY = _bounceAnimation.value;
-      
-      // Escala da sombra
-      double shadowScale = 1.0 - (bounceY.abs() / 15) * 0.3;
-
-      // Deslocamento da sombra para baixo (quanto mais o tumbleweed sobe, mais a sombra desce)
-      double shadowOffsetY = (bounceY.abs() / 15) * 10;
-
-      return Stack(
-        clipBehavior: Clip.none,
-        children: [
-          // Sombra
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Transform.translate(
-              offset: Offset(0, shadowOffsetY),
-              child: Transform.scale(
-                scale: shadowScale,
-                child: Center(
-                  child: Image.asset(
-                    'assets/imgs/tumbleweed_shadow.png',
-                    width: 200,
-                    height: 110,
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          // Tumbleweed
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Transform.translate(
-              offset: Offset(0, bounceY),
-              child: Transform.rotate(
-                angle: _rotationController.value * 2 * 3.1415926535,
-                child: Center(
-                  child: Image.asset(
-                    'assets/imgs/tumbleweed.png',
-                    width: 150,
-                    height: 150,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      );
-    },
-  );
-}
-}

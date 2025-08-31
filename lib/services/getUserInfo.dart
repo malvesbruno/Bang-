@@ -1,7 +1,8 @@
 import 'package:bang/appdata.dart';
+import 'package:bang/models/dadosUser.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-final firestore = FirebaseFirestore.instance;
+final firestore = FirebaseFirestore.instance; // cria a variável do banco de dados
 
 Future<Map<String, dynamic>?> pegarDadosJogador(String uid) async {
   try {
@@ -19,6 +20,7 @@ Future<Map<String, dynamic>?> pegarDadosJogador(String uid) async {
   return null;
 }
 
+// pega todos os dados do user
 Future<void> pegarTodosDadosJogador(String uid) async {
   try {
     final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
@@ -29,7 +31,7 @@ Future<void> pegarTodosDadosJogador(String uid) async {
       AppData.qtGold = doc['qtGold'] ?? 0;
       AppData.amigos = List<String>.from(doc['amigos'] ?? []);
       AppData.avataresComprados = List<String>.from(doc['avataresComprados'] ?? []);
-      AppData.currentAvatar = doc['currentAvatar'] ??'';
+      AppData.currentAvatar = doc['currentAvatar'] ?? 'assets/imgs/avatares/avatar1.png';
       AppData.gamertag = doc['gamertag'] ?? '';
       AppData.revolveresComprados = List<String>.from(doc['revolveresComprados'] ?? []);
     }
@@ -38,12 +40,13 @@ Future<void> pegarTodosDadosJogador(String uid) async {
   }
 }
 
-Future<void> atualizarDadosJogador(String uid, Map<String, dynamic> novosDados) async {
+//atualiza o dados do jogador
+Future<void> atualizarDadosJogador(String uid, Dadosuser novosDados) async {
   try {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
-        .update(novosDados);
+        .update(novosDados.toMap());
   } catch (e) {
     print("Erro ao atualizar dados do jogador $uid: $e");
   }

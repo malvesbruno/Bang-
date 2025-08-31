@@ -6,17 +6,15 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../appdata.dart';
-import '../pages/bluetoothClientPage.dart';
 import '../pages/rankingPage.dart';
 import '../pages/duelOnlineMenu.dart';
-import '../services/enviarConvites.dart';
+import '../services/nuvem.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'onlineWaitAnswerPage.dart';
 import '../pages/onlineVersusPage.dart';
-import '../services/enviarConvites.dart';
 import '../pages/addAmigos.dart';
 import 'dart:async';
 
+// Página de menu online
 class onlineMenuPage extends StatefulWidget {
   const onlineMenuPage({super.key});
 
@@ -25,25 +23,26 @@ class onlineMenuPage extends StatefulWidget {
 }
 
 class _onlineMenuPageState extends State<onlineMenuPage> {
-  final AudioPlayer audioPlayer = AudioPlayer();
-  bool playin = AppData.mute == 0;
-  bool temConviteNovo = false;
-  StreamSubscription? _convitesSub;
+  final AudioPlayer audioPlayer = AudioPlayer(); // define a variável que toca áudios
+  bool playin = AppData.mute == 0; // define se o áudio vai tocar
+  bool temConviteNovo = false; // variável que define se tem convite novo
+  StreamSubscription? _convitesSub; // variável que fica verificando se tem convite novo
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    playin = AppData.mute == 0;
-    final userId = FirebaseAuth.instance.currentUser!.uid;
+    playin = AppData.mute == 0; // define se o áudio vai tocar
+    final userId = FirebaseAuth.instance.currentUser!.uid; // variável que pega o id do login
 
+    // pega os dados do user
     pegarTodosDadosJogador(userId);
 
+    // fica verificando se tem convite novo
     ouvirConvites(userId, onConviteRecebido);
     _convitesSub = ouvirConvitesAmizade(userId, (conviteId, convite) {
       setState(() {
@@ -52,10 +51,12 @@ class _onlineMenuPageState extends State<onlineMenuPage> {
     }) as StreamSubscription?;
   }
 
+  // se receber um convite
   void onConviteRecebido( String conviteId, Map<String, dynamic> convite, ) {
   
-    final String uid = FirebaseAuth.instance.currentUser!.uid;
+    final String uid = FirebaseAuth.instance.currentUser!.uid; // variável que pega o id do login
 
+  // mostra o dialog quando recebe um convite
   showDialog(
   context: context,
   builder: (context) {

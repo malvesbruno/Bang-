@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import '../pages/finishDuelPage.dart';
 import '../pages/playingPage.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 
+
+// Tela de treino
 class TreinoDuelPage extends StatefulWidget {
 
   const TreinoDuelPage({super.key,});
@@ -13,10 +14,7 @@ class TreinoDuelPage extends StatefulWidget {
 }
 
 class _TreinoDuelPageState extends State<TreinoDuelPage> {
-  final flutterReactiveBle = FlutterReactiveBle();
-  Duration? meuTempo;
-  Duration? tempoOutroJogador;
-  bool _finalizado = false;
+  Duration? meuTempo; // meu tempo
 
   @override
   void initState() {
@@ -29,6 +27,8 @@ class _TreinoDuelPageState extends State<TreinoDuelPage> {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   }
 
+
+  //define o que fazer para quando sacou
    void _quandoSacou(Duration duracao) async {
     meuTempo = duracao;
 

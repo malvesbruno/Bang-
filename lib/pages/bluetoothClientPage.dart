@@ -1,10 +1,16 @@
 import 'package:bang/pages/bluetoothPreparePage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
-import 'package:app_settings/app_settings.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../pages/bluetoothLobbyPage.dart';
+import '../widgets/tumbleWeed.dart';
 
+
+/// Página que representa o cliente Bluetooth do jogo.
+/// 
+/// Essa tela é responsável por procurar o host, tentar se conectar e 
+/// confirmar a sincronização inicial para que os jogadores possam 
+/// prosseguir para a preparação da partida.
 class BluetoothClientPage extends StatefulWidget {
   const BluetoothClientPage({super.key});
 
@@ -14,23 +20,25 @@ class BluetoothClientPage extends StatefulWidget {
 
 class _BluetoothClientPageState extends State<BluetoothClientPage> {
   final _ble = FlutterReactiveBle();
-  late DiscoveredDevice _connectedDevice;
-  late QualifiedCharacteristic _writeChar;
+  late DiscoveredDevice _connectedDevice; // Dispositivo conectado
+  late QualifiedCharacteristic _writeChar; // Característica usada para enviar/receber dados
 
+  // UUIDs que identificam o serviço e a característica do jogo
   final Uuid serviceUuid = Uuid.parse("12345678-1234-5678-1234-56789abcdef0");
   final Uuid charUuid = Uuid.parse("abcdef01-1234-5678-1234-56789abcdef0");
 
-  bool _isScanning = false;
-  bool _deviceConnected = false;
-  bool _modoTeste = true;
+  bool _isScanning = false; // Indica se o cliente está escaneando
+  bool _deviceConnected = false; // Indica se já há um dispositivo conectado
+  bool _modoTeste = false; // Usado para simulação em testes
 
   Stream<DiscoveredDevice>? _scanStream;
-  bool _dialogShown = false;
+  bool _dialogShown = false; // Evita abrir múltiplos diálogos de Bluetooth desligado
 
   @override
   void initState() {
     super.initState();
 
+    // Monitora o status do Bluetooth
     _ble.statusStream.listen((status) {
       print("Status do Bluetooth: $status");
 
@@ -43,6 +51,7 @@ class _BluetoothClientPageState extends State<BluetoothClientPage> {
       }
     });
 
+      // Checa o status inicial após a renderização da tela
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final initialStatus = await _ble.statusStream.first;
       if (initialStatus == BleStatus.poweredOff) {
@@ -53,6 +62,7 @@ class _BluetoothClientPageState extends State<BluetoothClientPage> {
     });
   }
 
+  //começa a procurar pelo cliente
   void startScanning() {
     setState(() => _isScanning = true);
 
@@ -116,6 +126,7 @@ class _BluetoothClientPageState extends State<BluetoothClientPage> {
     }
   }
 
+  /// Vai para a tela de preparação do jogo após conexão bem-sucedida.
   void _goToPreparationScreen() {
     if (mounted) {
       Navigator.pushReplacement(
@@ -125,6 +136,7 @@ class _BluetoothClientPageState extends State<BluetoothClientPage> {
     }
   }
 
+/// Exibe um diálogo pedindo para ativar o Bluetooth.
   void _showBluetoothEnableDialog() {
     if (_dialogShown) return;
     _dialogShown = true;
@@ -216,7 +228,7 @@ class _BluetoothClientPageState extends State<BluetoothClientPage> {
                   const SizedBox(
                     width: 150,
                     height: 200,
-                    child: _AnimatedTumbleweedWithShadow(),
+                    child: AnimatedTumbleweedWithShadow(),
                   ),
                 if (_modoTeste)
                   Padding(
@@ -248,100 +260,6 @@ class _BluetoothClientPageState extends State<BluetoothClientPage> {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _AnimatedTumbleweedWithShadow extends StatefulWidget {
-  const _AnimatedTumbleweedWithShadow();
-
-  @override
-  State<_AnimatedTumbleweedWithShadow> createState() => _AnimatedTumbleweedWithShadowState();
-}
-
-class _AnimatedTumbleweedWithShadowState extends State<_AnimatedTumbleweedWithShadow>
-    with TickerProviderStateMixin {
-  late AnimationController _rotationController;
-  late AnimationController _bounceController;
-  late Animation<double> _bounceAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _rotationController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    )..repeat();
-
-    _bounceController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1000),
-    )..repeat(reverse: true);
-
-    _bounceAnimation = Tween<double>(begin: 0, end: -35).animate(
-      CurvedAnimation(parent: _bounceController, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _rotationController.dispose();
-    _bounceController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: Listenable.merge([_rotationController, _bounceAnimation]),
-      builder: (context, child) {
-        double bounceY = _bounceAnimation.value;
-        double shadowScale = 1.0 - (bounceY.abs() / 15) * 0.3;
-        double shadowOffsetY = (bounceY.abs() / 15) * 10;
-
-        return Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Transform.translate(
-                offset: Offset(0, shadowOffsetY),
-                child: Transform.scale(
-                  scale: shadowScale,
-                  child: Center(
-                    child: Image.asset(
-                      'assets/imgs/tumbleweed_shadow.png',
-                      width: 200,
-                      height: 110,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Transform.translate(
-                offset: Offset(0, bounceY),
-                child: Transform.rotate(
-                  angle: _rotationController.value * 2 * 3.1415926535,
-                  child: Center(
-                    child: Image.asset(
-                      'assets/imgs/tumbleweed.png',
-                      width: 150,
-                      height: 150,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
     );
   }
 }

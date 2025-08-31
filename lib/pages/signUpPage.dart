@@ -4,24 +4,26 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../appdata.dart';
-import 'dart:convert';
+import '../widgets/tumbleWeed.dart';
 
+// Tela de SignUp
 class SignupPage extends StatefulWidget {
   @override
   _SignupPageState createState() => _SignupPageState();
 }
 
 class _SignupPageState extends State<SignupPage> {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  final gamertagController = TextEditingController();
+  final emailController = TextEditingController(); // variável que controla o a info do input do campo email
+  final passwordController = TextEditingController(); // variável que controla o a info do input do campo password
+  final gamertagController = TextEditingController(); // variável que controla o a info do input do campo gamertag
 
-  final auth = FirebaseAuth.instance;
-  final firestore = FirebaseFirestore.instance;
+  final auth = FirebaseAuth.instance; // cria a variável de login do user
+  final firestore = FirebaseFirestore.instance; // cria a variável de controle para database
 
-  bool isLoading = false;
-  String? errorMessage;
+  bool isLoading = false; // variável se pode carregar
+  String? errorMessage; // define a mensagem de error
 
+  //verifica se a gamertag já foi pego
   Future<bool> isGamertagTaken(String gamertag) async {
     final query = await firestore
         .collection('users')
@@ -31,16 +33,20 @@ class _SignupPageState extends State<SignupPage> {
     return query.docs.isNotEmpty;
   }
 
+  // Função de signup
   Future<void> signup() async {
+    if (isLoading) return; // se já estiver carregando ignora
+    // torna carregando e error message para verdadeiro
     setState(() {
       isLoading = true;
       errorMessage = null;
     });
 
-    final email = emailController.text.trim();
-    final password = passwordController.text.trim();
-    final gamertag = gamertagController.text.trim().toLowerCase();
+    final email = emailController.text.trim(); // limpa o texto do email
+    final password = passwordController.text.trim(); // limpa o texto do password
+    final gamertag = gamertagController.text.trim().toLowerCase(); // limpa o texto do gamertag
 
+    // se alguma info estiver vázia, ele não está mais carregando e mostra a mensagem de erro
     if (email.isEmpty || password.isEmpty || gamertag.isEmpty) {
       setState(() {
         isLoading = false;
@@ -106,7 +112,38 @@ class _SignupPageState extends State<SignupPage> {
     final boxColor = Color(0xFFC19A6B); // bege amarelado
     final buttonColor = Color(0xFF4B3B2A); // marrom escuro
 
-    return Scaffold(
+    return isLoading ? Scaffold(
+    backgroundColor: const Color.fromARGB(255, 243, 165, 152),
+    body: Stack(
+      children: [
+        Positioned.fill(
+  child: Image.asset(
+    'assets/imgs/bg_menu.png', // ou o caminho da sua imagem
+    fit: BoxFit.cover,
+  ),
+),
+Positioned.fill(
+      child: Container(
+        color: Colors.black.withOpacity(0.3), // 0.0 = transparente, 1.0 = preto total
+      ),
+    ),
+        // Conteúdo centralizado
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(height: 20),
+              SizedBox(
+                width: 150,
+                height: 200,
+                child: AnimatedTumbleweedWithShadow(),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  ) : Scaffold(
       backgroundColor: backgroundColor,
       body: 
       Container(

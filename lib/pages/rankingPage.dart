@@ -1,6 +1,3 @@
-import 'package:bang/main.dart';
-import 'package:bang/pages/bluetoothPreparePage.dart';
-import 'package:bang/pages/onlineWaitAnswerPage.dart';
 import 'package:bang/pages/rankingMoreDetailPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,9 +5,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../appdata.dart';
 import '../services/getAmigos.dart';
-import '../services/enviarConvites.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+
+// Página de ranking online
 class Rankingpage extends StatefulWidget {
   const Rankingpage({super.key});
 
@@ -19,11 +17,11 @@ class Rankingpage extends StatefulWidget {
 }
 
 class _RankingpageState extends State<Rankingpage> {
-  final AudioPlayer audioPlayer = AudioPlayer();
-  bool playin = AppData.mute == 0;
-  List<Map<String, dynamic>> ranking = [];
+  final AudioPlayer audioPlayer = AudioPlayer(); // variável que toca o audio
+  bool playin = AppData.mute == 0; // variável que toca o audio
+  List<Map<String, dynamic>> ranking = []; // cria uma lista vázio para depois carregar o ranking
   int _currentIndex = 0; // começa do zero
-  final ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController(); // controla o scroll da page
 
   
 
@@ -36,15 +34,11 @@ class _RankingpageState extends State<Rankingpage> {
       DeviceOrientation.portraitDown,
     ]);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    playin = AppData.mute == 0;
-    _loadAmigos();
-    /* ranking.sort((a, b) {
-    int bountyA = int.parse(a['bounty']!);
-    int bountyB = int.parse(b['bounty']!);
-    return bountyB.compareTo(bountyA); // ordem decrescente
-  }); */
+    playin = AppData.mute == 0; // variável que toca o audio
+    _loadAmigos(); // carrega todos os users
   }
 
+  // carrega para o meu id
   void _scrollToMyPosition() {
   final myIndex = ranking.indexWhere(
       (player) => player['id'] == FirebaseAuth.instance.currentUser!.uid);
@@ -59,22 +53,22 @@ class _RankingpageState extends State<Rankingpage> {
     );
   }
 }
-
+ 
+ // função que calcula o valor da cabeça do user
   String _getBounty(double qtVitoria, double qtDerrota, double qtEmpate){
-    final base = 20;
+    final base = 20; // base 20 para que não seja possível ter uma bounty abaixo de 20
     final v = qtVitoria;
   final d = qtDerrota;
   final e = qtEmpate;
-
+  // o preço é igual à base mais as vitórias multiplicadas 250 menos as derrotas multiplicadas por 100 menos os empates multiplicados por 50
+  // assim criamos um sistema que não se torna muito fácil, aumentando a atesão
   double bounty = base + (v * 250) - (d * 100) - (e * 50);
   bounty = bounty.clamp(0, 10000000); // mínimo 0, máximo 10 mil
-  return "${bounty.toStringAsFixed(2)}";
+  return "${bounty.toStringAsFixed(2)}"; // retorna em um string com dois números depois da virgula. Similar à comos usamos com dinheiro
   }
 
+ // carrega todos os users
   Future<void> _loadAmigos() async {
-  // Se já carregou tudo, nem busca
-
-
   final amigosInfo = await getTodosData();
   setState(() {
     final novos = amigosInfo.map((amigo) => {

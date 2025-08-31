@@ -1,19 +1,14 @@
-import 'package:bang/main.dart';
-import 'package:bang/services/enviarConvites.dart';
+import 'package:bang/services/nuvem.dart';
 import 'package:flutter/material.dart';
-import '../pages/playingPage.dart';
 import 'package:flutter/services.dart';
-import 'package:bang/pages/onlineMenu.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../appdata.dart';
-import '../pages/bluetoothHostPage.dart';
-import '../pages/bluetoothClientPage.dart';
-import '../pages/rankingPage.dart';
-import '../pages/signUpPage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+
+//página usada para o user buscar e adicionar amigos
 class AddAmigosPage extends StatefulWidget {
   const AddAmigosPage({super.key});
 
@@ -22,46 +17,49 @@ class AddAmigosPage extends StatefulWidget {
 }
 
 class _AddAmigosPageState extends State<AddAmigosPage> {
-  final AudioPlayer audioPlayer = AudioPlayer();
-  bool playin = AppData.mute == 0;
-  final TextEditingController emailController = TextEditingController();
-  final auth = FirebaseAuth.instance;
-  final firestore = FirebaseFirestore.instance;
-  List<Map<String, dynamic>> resultados = [];
+  final AudioPlayer audioPlayer = AudioPlayer(); //cria a variavel AudioPlayer que é usada para tocar sons 
+  bool playin = AppData.mute == 0; // a variável playin determina se o audio vai tocar ou não
+  final TextEditingController emailController = TextEditingController(); // pega os dados digitados pelo user
+  final auth = FirebaseAuth.instance; // instância do FirebaseAuth. Usado para acessar o login de um user
+  final firestore = FirebaseFirestore.instance; // instância do FirebaseAuth. Usado para acessar o banco de dados
+  List<Map<String, dynamic>> resultados = []; // criar uma lista vázia para os resultados da pesquisa
 
 
 
   @override
   void initState() {
-    // TODO: implement initState
+    // determina que a tela do ceular fique de pé
     super.initState();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    //a variável playin determina se o audio vai tocar ou não
     playin = AppData.mute == 0;
   }
 
   Future<void> buscarAmigo(String termo) async {
-  if (termo.isEmpty) return;
+  if (termo.isEmpty) return; //se o termo estiver vázio ele não segue para as próximas etapas
 
-  List<Map<String, dynamic>> resultadosTemp = [];
+  List<Map<String, dynamic>> resultadosTemp = []; // lista de resultados temporários
 
+  // tenta buscar a gamertag ou o id no banco de dados
   try {
-    // busca pelo gamertag
+    // busca pelo gamertag no banco de dados 
     final querySnapshot = await firestore
         .collection('users')
         .where('gamertag', isEqualTo: termo)
         .get();
 
+    // adiciona o resultado da busca pela gamertag em uma lista temporária
     resultadosTemp.addAll(querySnapshot.docs.map((doc) => {
       "id": doc.id,
       "name": doc['gamertag'] ?? "Sem nome",
       "avatar": doc['currentAvatar'] ?? 'assets/imgs/avatares/avatar1_pose1.png',
     }));
 
-    // busca pelo ID do documento
+    // busca pelo ID do documento no banco de dados
     final docSnap = await firestore.collection('users').doc(termo).get();
     if (docSnap.exists) {
       final data = {
@@ -69,20 +67,22 @@ class _AddAmigosPageState extends State<AddAmigosPage> {
         "name": docSnap['gamertag'] ?? "Sem nome",
         "avatar": docSnap['currentAvatar'] ?? 'assets/imgs/avatares/avatar1_pose1.png',
       };
-      // evita duplicata
+      // evita duplicata verificando se o que econtramos agora já não está no banco de dados
       if (!resultadosTemp.any((e) => e['id'] == docSnap.id)) {
+        // caso não adiciona na lista temporária
         resultadosTemp.add(data);
       }
     }
 
     setState(() {
+      // seta o estado da nossa lista para ser igual a resultadoTemp e atualiza a pagina
       resultados = resultadosTemp;
     });
 
   } catch (e) {
     print("Erro ao buscar amigo: $e");
     setState(() {
-      resultados = [];
+      resultados = []; // caso haja um erro a lista fica vázia
     });
   }
 }
@@ -140,6 +140,7 @@ class _AddAmigosPageState extends State<AddAmigosPage> {
                   ],
                 ),
                 SizedBox(height: 45,),
+                // cria um input de texto personalizado
                 _buildTextField('Digite o ID ou o nome', emailController, boxColor),
                 SizedBox(height: 20),
                 ElevatedButton(
@@ -152,7 +153,7 @@ class _AddAmigosPageState extends State<AddAmigosPage> {
                     elevation: 8,
                   ),
                   onPressed: () async{
-                    print('DEBUG ${emailController.text}');
+                    //tenta buscar a gamertag ou id do amigo no banco de dados
                     await buscarAmigo(emailController.text);
                   },
                   child: Text(
@@ -166,13 +167,14 @@ class _AddAmigosPageState extends State<AddAmigosPage> {
                 ),
                 SizedBox(height: 20),  
 Container(
-  height: 150, // altura fixa para o scroll de resultados
-  child: resultados.isEmpty
+  height: 150, // Se o resultado não estiver vázio, mostra todos os resultados da busca
+  child: resultados.isEmpty 
       ? Center(child: Text("Nenhum usuário encontrado", style: TextStyle(color: Colors.white)))
       : ListView.builder(
           itemCount: resultados.length,
           itemBuilder: (context, index) {
             final player = resultados[index];
+            // cria um modelo de elemento para os resultados 
             return customListTile(avatarPath: player['avatar'], name: player['name'], onTap: (){
               enviarConviteAmizade(player['id']);
               resultados = [];
@@ -191,6 +193,7 @@ Container(
         top: 20,
         child: ElevatedButton(
                     onPressed: () {
+                      // volta para a última tela
                       Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(

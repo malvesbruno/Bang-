@@ -1,9 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+
+// Pega os dados dos amigos do user
 Future<List<Map<String, dynamic>>> getAmigosData(List<String> amigosIds) async {
-  final firestore = FirebaseFirestore.instance;
-  List<Map<String, dynamic>> amigosData = [];
+  final firestore = FirebaseFirestore.instance; // cria a variável da database
+  List<Map<String, dynamic>> amigosData = []; // cria uma lista para popular com amigos depois
 
   // Quebra em blocos de até 10
   for (var i = 0; i < amigosIds.length; i += 10) {
@@ -30,9 +31,10 @@ Future<List<Map<String, dynamic>>> getAmigosData(List<String> amigosIds) async {
   return amigosData;
 }
 
+// pega o dados de todos os users
 Future<List<Map<String, dynamic>>> getTodosData() async {
   try {
-    final firestore = FirebaseFirestore.instance;
+    final firestore = FirebaseFirestore.instance; // cria a variável da database
     final querySnapshot = await firestore.collection('users').get();
 
     return querySnapshot.docs.map((doc) {

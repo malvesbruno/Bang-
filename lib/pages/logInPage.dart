@@ -1,18 +1,14 @@
-import 'package:bang/main.dart';
 import 'package:flutter/material.dart';
-import '../pages/playingPage.dart';
 import 'package:flutter/services.dart';
 import 'package:bang/pages/onlineMenu.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../appdata.dart';
-import '../pages/bluetoothHostPage.dart';
-import '../pages/bluetoothClientPage.dart';
-import '../pages/rankingPage.dart';
 import '../pages/signUpPage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../widgets/tumbleWeed.dart';
 
+//Página de login
 class LogInPage extends StatefulWidget {
   const LogInPage({super.key});
 
@@ -21,22 +17,25 @@ class LogInPage extends StatefulWidget {
 }
 
 class _LogInPageState extends State<LogInPage> {
-  final AudioPlayer audioPlayer = AudioPlayer();
-  bool playin = AppData.mute == 0;
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final auth = FirebaseAuth.instance;
-  final firestore = FirebaseFirestore.instance;
-
+  final AudioPlayer audioPlayer = AudioPlayer(); // define a variável que toca áudios
+  bool playin = AppData.mute == 0; // define se o áudio vai tocar
+  final TextEditingController emailController = TextEditingController(); // variável que controla o a info do input do campo email
+  final TextEditingController passwordController = TextEditingController();  // variável que controla o a info do input do campo password
+  final auth = FirebaseAuth.instance; // cria a variável de login do user
+  final firestore = FirebaseFirestore.instance; // cria a variável de controle para database
+  
+  //tenta fazer o login do user
   Future<void> login() async {
+    if (isLoading) return; // se já estiver carregando, não faz nada
     setState(() {
-      isLoading = true;
-      errorMessage = null;
+      isLoading = true; // define o carregando para verdadeiro
+      errorMessage = null; // define o erro como nenhum
     });
 
-    final email = emailController.text.trim();
-    final password = passwordController.text.trim();
+    final email = emailController.text.trim(); // limpa o texto do email
+    final password = passwordController.text.trim(); // limpa o texto do password
 
+    // se o email ou o password estiverem vázios, o carregando se torna falso e cria uma mensagem de erro
     if (email.isEmpty || password.isEmpty) {
       setState(() {
         isLoading = false;
@@ -83,6 +82,8 @@ class _LogInPageState extends State<LogInPage> {
                 ? List<String>.from(data['revolveresComprados'])
                 : [],
           );
+          AppData.currentAvatar = data['currentAvatar'] ?? 'assets/imgs/avatares/avatar1.png';
+          AppData.currentRevolver = data['currentRevolver'] ?? 'assets/imgs/avatares/revolver.png';
 
           AppData.salvartudo();
 
@@ -117,7 +118,6 @@ class _LogInPageState extends State<LogInPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -133,7 +133,39 @@ class _LogInPageState extends State<LogInPage> {
     final boxColor = Color(0xFFC19A6B); // bege amarelado
     final buttonColor = Color(0xFF4B3B2A); // marrom escuro
 
-    return Scaffold(
+
+    return isLoading ? Scaffold(
+    backgroundColor: const Color.fromARGB(255, 243, 165, 152),
+    body: Stack(
+      children: [
+        Positioned.fill(
+  child: Image.asset(
+    'assets/imgs/bg_menu.png', // ou o caminho da sua imagem
+    fit: BoxFit.cover,
+  ),
+),
+Positioned.fill(
+      child: Container(
+        color: Colors.black.withOpacity(0.3), // 0.0 = transparente, 1.0 = preto total
+      ),
+    ),
+        // Conteúdo centralizado
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(height: 20),
+              SizedBox(
+                width: 150,
+                height: 200,
+                child: AnimatedTumbleweedWithShadow(),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  ) : Scaffold(
       backgroundColor: backgroundColor,
       body: 
       Container(

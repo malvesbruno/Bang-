@@ -1,6 +1,5 @@
 import 'package:bang/main.dart';
 import 'package:flutter/material.dart';
-import '../pages/playingPage.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -8,6 +7,8 @@ import '../appdata.dart';
 import '../pages/bluetoothHostPage.dart';
 import '../pages/bluetoothClientPage.dart';
 
+
+/// tela onde o user decide se vai hostear ou ser cliente do duelo por bluetooth
 class BluetoothLobbyPage extends StatefulWidget {
   const BluetoothLobbyPage({super.key});
 
@@ -21,7 +22,6 @@ class _BluetoothLobbyPageState extends State<BluetoothLobbyPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,

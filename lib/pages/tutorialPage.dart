@@ -4,9 +4,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart';
 import '../appdata.dart';
 
-
-
-
+// tela de tutorial
 class Tutorialpage extends StatefulWidget {
   const Tutorialpage({super.key});
 

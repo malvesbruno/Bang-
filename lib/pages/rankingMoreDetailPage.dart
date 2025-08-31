@@ -3,13 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../appdata.dart';
-import '../pages/rankingPage.dart';
 
+// mostrar mais informações do user do ranking
 class RankingMDpage extends StatefulWidget {
-  final String name;
-  final String bounty;
-  final String avatar;
-  final int duelosVencidos;
+  final String name; // nome do user
+  final String bounty; // valor do user
+  final String avatar; // avatar do user
+  final int duelosVencidos; // duelos vencidos pelo user
 
   const RankingMDpage({super.key, required this.name, required this.bounty, required this.avatar, required this.duelosVencidos});
 
@@ -18,19 +18,18 @@ class RankingMDpage extends StatefulWidget {
 }
 
 class _RankingpageState extends State<RankingMDpage> {
-  final AudioPlayer audioPlayer = AudioPlayer();
-  bool playin = AppData.mute == 0;
+  final AudioPlayer audioPlayer = AudioPlayer(); // variável que toca o audio
+  bool playin = AppData.mute == 0; // define se pode tocar o audio
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    playin = AppData.mute == 0;
+    playin = AppData.mute == 0; // define se pode tocar o audio
 
   }
 

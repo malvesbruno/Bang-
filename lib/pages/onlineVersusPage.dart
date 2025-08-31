@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import '../models/playerModel.dart';
 import 'package:flutter/services.dart';
@@ -7,16 +6,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:particles_flutter/component/particle/particle.dart';
 import 'package:particles_flutter/particles_engine.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'dart:math';
-import '../services/enviarConvites.dart';
+import '../services/nuvem.dart';
 import '../pages/onlinePage.dart';
 
-
+// tela de preparação para o duelo
 class DuelScreen extends StatefulWidget {
-  final String player1Uid;
-  final String player2Uid;
+  final String player1Uid; // define o id player1
+  final String player2Uid; // define o id player2
 
   const DuelScreen({
     super.key,
@@ -31,20 +29,20 @@ class DuelScreen extends StatefulWidget {
 
 class _DuelScreenState extends State<DuelScreen>
     with TickerProviderStateMixin {
-  late AnimationController _countdownController;
-  final db = FirebaseDatabase.instance.ref();
+  late AnimationController _countdownController; //controle de animação
+  final db = FirebaseDatabase.instance.ref(); // variável da database
 
-  final AudioPlayer audioPlayer = AudioPlayer();
+  final AudioPlayer audioPlayer = AudioPlayer(); // define a variável que toca áudios
 
-  bool isPlayer1 = false;
-  bool isPlayer2 = false;
-  Map<String, dynamic>? duelo;
+  bool isPlayer1 = false; //define se sou o player1
+  bool isPlayer2 = false; //define se sou o player2
+  Map<String, dynamic>? duelo; //informação do duelo
 
 
   String dbplayer1 = ''; 
 
-  Player? player1;
-  Player? player2;
+  Player? player1; // cria a variável para pegar info do player1
+  Player? player2; // cria a variável para pegar info do player2
 
   @override
   void initState() {
@@ -56,8 +54,9 @@ class _DuelScreenState extends State<DuelScreen>
     ]);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
-    _iniciarSequenciaSonora();
+    _iniciarSequenciaSonora(); // inicia sequência de música
 
+    // controle da animaçãp
     _countdownController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 5),
@@ -68,6 +67,7 @@ class _DuelScreenState extends State<DuelScreen>
       _loadPlayersEIniciarDuelo();
     });
 
+  //quando termina a contagem, vai para a pagina de duelo online
   _countdownController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
           audioPlayer.stop();
@@ -85,6 +85,7 @@ class _DuelScreenState extends State<DuelScreen>
   }});
   }
 
+  //inicia a sequência sonora
   void _iniciarSequenciaSonora() async{
       audioPlayer.setVolume(0.7);
       await audioPlayer.setAudioContext(AudioContext(
@@ -100,20 +101,20 @@ class _DuelScreenState extends State<DuelScreen>
 
   }
 
+  // carrega as informações do player
   Future<void> _loadPlayers() async {
-  print('UID ${widget.player1Uid}');
-  print('UID ${widget.player2Uid}');
-
+      // busca no banco de dados o player 1
       final snap1 = await FirebaseFirestore.instance
           .collection('users')
           .doc(widget.player1Uid)
           .get();
-
+      // busca no banco de dados o player 2
       final snap2 = await FirebaseFirestore.instance
           .collection('users')
           .doc(widget.player2Uid)
           .get();
 
+      // se os dois existem, cria um map para cada um
       if (snap1.exists && snap2.exists) {
         setState(() {
           player1 = Player.fromMap(widget.player1Uid, snap1.data()!);
@@ -122,26 +123,22 @@ class _DuelScreenState extends State<DuelScreen>
   }
 }
 
+// carrega os players e inicia o duelo
 Future<void> _loadPlayersEIniciarDuelo() async {
   await _loadPlayers(); // já carrega os jogadores
 
   // Esperar o duelo existir
   while (duelo == null) {
-    duelo = await pegarDuelo(widget.player1Uid, widget.player2Uid);
+    duelo = await pegarDuelo(widget.player1Uid, widget.player2Uid); // busca o duelo
     print('Duelo' '$duelo');
       if (duelo == null) {
       await Future.delayed(const Duration(milliseconds: 500)); // espera meio segundo e tenta de novo
     }
       }
 
-  final duelPlayer1 = duelo?['duelo']?['jogador1']?.toString().trim();
-final duelPlayer2 = duelo?['duelo']?['jogador2']?.toString().trim();
-      final myUid = widget.player1Uid.trim();
-
-print('duelo jogador1: $duelPlayer1');
-print('duelo jogador2: $duelPlayer2');
-print('meu UID: $myUid');
-
+  final duelPlayer1 = duelo?['duelo']?['jogador1']?.toString().trim(); // pega o player1 do duelo
+final duelPlayer2 = duelo?['duelo']?['jogador2']?.toString().trim(); // pega o player2 do duelo 
+      // define se você é o player 1 ou o 2
       if (player1!.uid == duelPlayer1) {
         isPlayer1 = true;
         isPlayer2 = false;
@@ -175,6 +172,7 @@ print('meu UID: $myUid');
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
+    //cria particulas
     List<Particle> createParticles(int count) {
       var rng = Random();
   List<Particle> particles = [];

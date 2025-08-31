@@ -1,18 +1,17 @@
 import 'package:bang/appdata.dart';
 import 'package:bang/services/getUserInfo.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
-import '../services/ajustarCampeonato.dart';
-import 'dart:math';
 import 'dart:async';
 
 
-final db = FirebaseDatabase.instance.ref();
+// nesse arquivo temos funções que enviam convites e do duelo
 
-final fasesCampeonato = ["quartas", "semifinal", "final"];
+final db = FirebaseDatabase.instance.ref(); // cria variável da database
 
 
+
+// enviar convite para duelo para amigo
 Future<String> enviarConvite(String destinatarioId,) async {
   final userId = FirebaseAuth.instance.currentUser!.uid;
   final conviteRef = db.child('convites').child(destinatarioId).push();
@@ -28,6 +27,7 @@ Future<String> enviarConvite(String destinatarioId,) async {
   return conviteId;
 }
 
+// envia convite de amizade
 Future<String> enviarConviteAmizade(String destinatarioId,) async {
   final userId = FirebaseAuth.instance.currentUser!.uid;
   final conviteRef = db.child('convitesAmizade').child(destinatarioId).push();
@@ -42,7 +42,8 @@ Future<String> enviarConviteAmizade(String destinatarioId,) async {
 
   return conviteId;
 }
-
+ 
+//ouve convite de duelo de amigos
 void ouvirConvites(String meuId, Function(String conviteID ,Map<String, dynamic> convite)? onConviteRecebido) {
    final convitesRef = db.child('convites').child(meuId);
   convitesRef.onChildAdded.listen((event) {
@@ -54,6 +55,7 @@ void ouvirConvites(String meuId, Function(String conviteID ,Map<String, dynamic>
   });
 }
 
+//ouve convite de amizade de user
 void ouvirConvitesAmizade(String meuId, Function(String conviteID ,Map<String, dynamic> convite)? onConviteRecebido) {
    final convitesRef = db.child('convitesAmizade').child(meuId);
   convitesRef.onChildAdded.listen((event) {
@@ -65,6 +67,8 @@ void ouvirConvitesAmizade(String meuId, Function(String conviteID ,Map<String, d
   });
 }
 
+
+// recebe todos os convites de amizade
 Future<List<Map<String, dynamic>>> getAllConvitesAmizade(String meuId) async {
   try {
     final convitesRef = await db.child('convitesAmizade').child(meuId).get();
@@ -90,6 +94,8 @@ Future<List<Map<String, dynamic>>> getAllConvitesAmizade(String meuId) async {
   }
 }
 
+
+// aceita convite de duelo
 Future<void> aceitarConvite(String meuId, String conviteId, Map convite, String remetenteId) async {
   final conviteRef = db.child('convites').child(meuId).child(conviteId);
   final dueloRef = db.child('duelos').push();
@@ -108,7 +114,7 @@ Future<void> aceitarConvite(String meuId, String conviteId, Map convite, String 
   // Aqui você pode fazer a lógica após aceitar, tipo iniciar jogo, notificar remetente, etc
 }
 
-
+// aceita convite de amizade
 Future<void> aceitarConviteAmizade(
   String meuId,
   String conviteId,
@@ -156,13 +162,13 @@ Future<void> aceitarConviteAmizade(
 }
 
 
-
+// rejeitar convite de amizade
 Future<void> rejeitarConviteAmizade(String meuId, String conviteId)async{
   await db.child("convitesAmizade/$meuId/$conviteId").remove();
 }
 
 
-
+// aguardas resposta de convite de duelo
 void aguardarResposta(String amigoId, String conviteId, Function(String status, String id, String conviteId) onMudouStatus) {
   final conviteRef = db.child('convites').child(amigoId).child(conviteId);
   
@@ -175,6 +181,7 @@ void aguardarResposta(String amigoId, String conviteId, Function(String status, 
   });
 }
 
+// ouvir campo inimigo
 void ouvirCampoInimigo({
   required bool jogador1,
   required String duelId,
@@ -192,6 +199,7 @@ void ouvirCampoInimigo({
   });
 }
 
+// escuta o fim do Duelo
 void EscutarFimDuelo({
   required bool jogador1,
   required String duelId,
@@ -224,6 +232,7 @@ void EscutarFimDuelo({
   });
 }
 
+// adicionar meu tempo no duelo
 Future<void> adicionarMeuTempo(bool jogador1, String duelId, int tempo) async{
   final conviteRef = db.child('duelos').child(duelId);
   if (jogador1){
@@ -233,6 +242,7 @@ Future<void> adicionarMeuTempo(bool jogador1, String duelId, int tempo) async{
 }
 }
 
+// adiciona saquei antes da hora no duelo
 Future<void> saqueiBT(bool jogador1, String duelId) async{
   final conviteRef = db.child('duelos').child(duelId);
   if (jogador1){
@@ -244,13 +254,13 @@ Future<void> saqueiBT(bool jogador1, String duelId) async{
 
 
 
-
+// rejeitar convite duelo
 Future<void> rejeitarConvite(String meuId, String conviteId) async {
   final conviteRef = db.child('convites').child(meuId).child(conviteId);
   await conviteRef.update({'status': 'recusado'});
 }
 
-
+// finaliza duelo
 Future<void> finalizarDuelo(jogador1, duelId) async{
   final conviteRef = db.child('duelos').child(duelId);
   if (jogador1){
@@ -260,6 +270,7 @@ Future<void> finalizarDuelo(jogador1, duelId) async{
 }
 }
 
+// busca duelo
 Future<Map<String, dynamic>?> pegarDuelo(String player1Id, String player2Id) async {
   final duelosRef = db.child('duelos');
 
@@ -297,6 +308,7 @@ Future<Map<String, dynamic>?> pegarDuelo(String player1Id, String player2Id) asy
   return null;
 }
 
+//entra na fila aleatória para achar duelo online
 Future<void> entrarFilaAleatoria(String uid, String gamertag) async {
   final filaRef = db.child('filaDuelos').child(uid);
   await filaRef.set({
@@ -305,6 +317,7 @@ Future<void> entrarFilaAleatoria(String uid, String gamertag) async {
   });
 }
 
+// tentar combinar duelista 
 Future<Map<String, String?>> tentarCombinarDuelista(String meuUid) async {
   final filaRef = db.child('filaDuelos');
   final snapshot = await filaRef.get();
@@ -342,12 +355,14 @@ Future<Map<String, String?>> tentarCombinarDuelista(String meuUid) async {
   return {'dueloId': dueloRef.key, 'oponente': escolhido};
 }
 
-
+// sair da lista
 Future<void> sairDaLista(String uid) async {
   final filaRef = db.child('filaDuelos').child(uid);
   filaRef.remove();
 }
 
+
+//deletar o convite de duelo
 Future<void> deletarConvite(String oponenteId, String conviteId) async {
   final conviteRef = db.child('convites').child(oponenteId).child(conviteId);
   conviteRef.remove();

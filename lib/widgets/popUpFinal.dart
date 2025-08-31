@@ -1,3 +1,4 @@
+import 'package:bang/models/dadosUser.dart';
 import 'package:bang/services/getUserInfo.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -5,15 +6,15 @@ import '../appdata.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FinalPopup extends StatefulWidget {
-  final Duration duracao;
-  final bool venceu;
-  final bool empate;
-  final bool sacouBT;
-  final bool sacaramBT;
-  final bool treino;
-  final VoidCallback onReturn;
-  final bool campeonato;
-  final String campeonatoId;
+  final Duration duracao; //duração duelo
+  final bool venceu; // venci duelo
+  final bool empate; // empate duelo
+  final bool sacouBT; // saquei antes do tempo 
+  final bool sacaramBT; // sacaram antes do tempo
+  final bool treino; //  define se é treino
+  final VoidCallback onReturn; //  define função de retorno
+  final bool campeonato; // define se é campeonato
+  final String campeonatoId; // define o id do campeonato
 
   const FinalPopup({super.key, required this.duracao, required this.venceu, required this.empate, required this.sacouBT, required this.sacaramBT, required this.onReturn, this.treino = false,
   this.campeonato = false, this.campeonatoId = ''});
@@ -27,7 +28,7 @@ class _FinalPopupState extends State<FinalPopup> with SingleTickerProviderStateM
   late Animation<double> _scaleAnimation;
   late String frase;
   
-
+  
   final List<String> venceuFrases = [
     "Essa cidade é pequena demais pra nós dois...",
     "Eu não sou besta pra tirar onda de herói...",
@@ -252,17 +253,26 @@ final List<String> treinoErro = [
 
   double bounty = base + (v * 250) - (d * 100) - (e * 50);
   bounty = bounty.clamp(0, 10000000); // mínimo 0, máximo 10 mil
+  try{
   final userId = FirebaseAuth.instance.currentUser!.uid;
-  atualizarDadosJogador(userId, {
-    'qtVitoria': AppData.qtVitoria,
-    'qtDerrota': AppData.qtDerrota,
-    'qtEmpate': AppData.qtEmpate,
-    'qtGold': AppData.qtGold,
-
-  });
+  atualizarDadosJogador(userId, Dadosuser(
+    qtVitoria: AppData.qtVitoria,
+    qtDerrota: AppData.qtDerrota,
+    qtEmpate: AppData.qtEmpate,
+    qtGold: AppData.qtGold,
+    amigos: AppData.amigos,
+    avataresComprados: AppData.avataresComprados,
+    revolveresComprados: AppData.revolveresComprados,
+    gamertag: AppData.gamertag,
+    currentAvatar: AppData.currentAvatar,
+    currentRevolver: AppData.currentRevolver));
+  } catch (e){
+    (){};
+  }
 
   return "${bounty.toStringAsFixed(2)}";
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -290,6 +300,22 @@ final List<String> treinoErro = [
         Stack(
           alignment: Alignment.topCenter,
           children: [
+        
+        Image.asset(
+          AppData.currentAvatar,
+          height: 340,
+          fit: BoxFit.contain,
+        ),
+        Text(
+      _getResult(),
+      textAlign: TextAlign.center,
+      style: GoogleFonts.vt323(
+        fontSize: 50,
+        foreground: Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 6
+          ..color = Color(0xFFDDD7CC),
+      ),),
             Text(
           _getResult(),
           style: GoogleFonts.vt323(
@@ -297,12 +323,6 @@ final List<String> treinoErro = [
             color: Color(0xFF544528),
             fontWeight: FontWeight.bold,
           ),
-        ),
-        
-        Image.asset(
-          'assets/imgs/avatares/avatar1_pose2.png',
-          height: 340,
-          fit: BoxFit.contain,
         ),
           ],
         ),

@@ -1,17 +1,13 @@
-import 'package:bang/main.dart';
-import 'package:bang/pages/bluetoothPreparePage.dart';
-import 'package:bang/pages/onlineWaitAnswerPage.dart';
-import 'package:bang/pages/rankingMoreDetailPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../appdata.dart';
-import '../services/getAmigos.dart';
-import '../services/enviarConvites.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import '../services/nuvem.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+
+//Pagina que mostra convites recebidos de amizade
 class ConvitesAmizadePage extends StatefulWidget {
   const ConvitesAmizadePage({super.key});
 
@@ -20,40 +16,31 @@ class ConvitesAmizadePage extends StatefulWidget {
 }
 
 class _ConvitesAmizadePageState extends State<ConvitesAmizadePage> {
-  final AudioPlayer audioPlayer = AudioPlayer();
-  bool playin = AppData.mute == 0;
-  List<Map<String, dynamic>> convites = [];
-  final ScrollController _scrollController = ScrollController();
+  final AudioPlayer audioPlayer = AudioPlayer(); // define a variável que toca áudios
+  bool playin = AppData.mute == 0; // define se o áudio vai tocar
+  List<Map<String, dynamic>> convites = []; // lista vázia que vai ser populada por convites recebidos
 
   
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    playin = AppData.mute == 0;
-    _loadAmigos();
-    /* ranking.sort((a, b) {
-    int bountyA = int.parse(a['bounty']!);
-    int bountyB = int.parse(b['bounty']!);
-    return bountyB.compareTo(bountyA); // ordem decrescente
-  }); */
+    playin = AppData.mute == 0;  // define se o áudio vai tocar
+    _loadConvites(); // carrega os convites do user
   }
 
-
-  Future<void> _loadAmigos() async {
-  // Se já carregou tudo, nem busca
-
-  final userId = FirebaseAuth.instance.currentUser!.uid;
-  final amigosInfo = await getAllConvitesAmizade(userId);
-  print(amigosInfo);
+  //pega todos os convites do user
+  Future<void> _loadConvites() async {
+  final userId = FirebaseAuth.instance.currentUser!.uid; // pega o id do login do user
+  final convitesInfo = await getAllConvitesAmizade(userId); //pega todos os convites do user
   setState(() {
-    convites = amigosInfo.map((el) => {
+    // atualiza a lista para carregar os convites  
+    convites = convitesInfo.map((el) => {
       "id": el['id'],
       "remetenteId": el['remetenteId'],
       "name": el['remetenteName']
@@ -108,7 +95,7 @@ class _ConvitesAmizadePageState extends State<ConvitesAmizadePage> {
     SizedBox(height: 50,),
     // Texto com contorno (usando Paint)
     Text(
-      'Selecione um Amigo',
+      'Convites de amizade',
       textAlign: TextAlign.center,
       style: GoogleFonts.vt323(
         fontSize: 40,
@@ -121,7 +108,7 @@ class _ConvitesAmizadePageState extends State<ConvitesAmizadePage> {
     ),
     // Texto preenchido
     Text(
-      'Selecione um Amigo',
+      'Convites de amizade',
       textAlign: TextAlign.center,
       style: GoogleFonts.vt323(
         fontSize: 40,
@@ -141,7 +128,7 @@ class _ConvitesAmizadePageState extends State<ConvitesAmizadePage> {
     itemCount: convites.length,
     itemBuilder: (context, index) {
       final player = convites[index];
-
+      // Mostra um elemento especial para cada convite
       return customListTile(
         name: player['name']!,
         remetenteId: player['remetenteId']!,

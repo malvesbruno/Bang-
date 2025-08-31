@@ -3,15 +3,12 @@ import 'package:flutter/widgets.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart';
 import '../services/motion_service.dart';
-import '../pages/finishDuelPage.dart';
 import '../appdata.dart';
 
-
-
-
+// Tela de jogo 
 class PlayingPage extends StatefulWidget {
-  final Function(Duration)? onReacaoFinalizada; 
-  final bool treino;
+  final Function(Duration)? onReacaoFinalizada; // o que fazer quando sacar
+  final bool treino; // define se é treino
   const PlayingPage({super.key, this.onReacaoFinalizada, this.treino = false});
 
   @override
@@ -19,18 +16,19 @@ class PlayingPage extends StatefulWidget {
 }
 
 class _PlayingPageState extends State<PlayingPage> {
-  bool _sacado = false;
-  bool _mostrarFire = false;
-  bool _podeSacar = false;
-  late DateTime _inicioTempoDeReacao;
-  final AudioPlayer audioPlayer = AudioPlayer();
-  final AudioPlayer audioPlayerDuel = AudioPlayer();
-  bool playin = AppData.mute == 0;
+  bool _sacado = false; // define se já sacou
+  bool _mostrarFire = false; // define se pode mostrar o fogo 
+  bool _podeSacar = false; // define se pode sacar
+  late DateTime _inicioTempoDeReacao; // tempo de reação
+  final AudioPlayer audioPlayer = AudioPlayer(); // variável que toca a os efeitos sonoros
+  final AudioPlayer audioPlayerDuel = AudioPlayer(); // variável que toca as músicas
+  bool playin = AppData.mute == 0; // define se pode tocar a música
 
 
-
+  // inicia a sequência sonora
   void iniciarSequenciaSonora() async {
     audioPlayer.setVolume(1);
+    //faz com que a efeito sonoro abaixe se tiver um player externo tocando
      await audioPlayer.setAudioContext(AudioContext(
   android: AudioContextAndroid(
     isSpeakerphoneOn: false,
@@ -65,8 +63,10 @@ setState(() {
     ]);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
-    iniciarSequenciaSonora();
+    iniciarSequenciaSonora(); // começar a sequência sonora
 
+    
+    // pegar o movimeto do user
     MotionService().startListening(onSaque: () async {
   if (!_podeSacar || _sacado) {
     if(!_podeSacar){
@@ -76,16 +76,21 @@ setState(() {
     return;
   }
   }
+  
 
+  //  define sacado e o mostrar o fire como verdadeiro 
   setState(() {
     _sacado = true;
     _mostrarFire = true;
   });
 
+  //pega o tempo de reação
   final duracaoReacao = DateTime.now().difference(_inicioTempoDeReacao);
 
+  // toca o audio do tiro
   await audioPlayer.play(AssetSource("audio/shot.mp3"));
 
+  // tira a imagem do fogo
   Future.delayed(Duration(seconds: 1), () {
     if (mounted) {
       setState(() {
@@ -93,6 +98,8 @@ setState(() {
       });
     }
   });
+
+  // define qual áudio toca se for treino ou duelo
   if (!widget.treino){
   await Future.delayed(Duration(milliseconds: 1000));
   await audioPlayer.play(AssetSource("audio/dyingCough.mp3"));
@@ -100,6 +107,8 @@ setState(() {
     await Future.delayed(Duration(milliseconds: 300));
   await audioPlayer.play(AssetSource("audio/glassBroken.mp3"));
   }
+
+  // para a música
   await Future.delayed(Duration(milliseconds: 1500));
   await audioPlayer.stop();
   await audioPlayerDuel.stop();
@@ -164,7 +173,7 @@ setState(() {
                 opacity: _sacado ? 0.0 : 1.0,
                 duration: Duration(milliseconds: 200),
                 child: Image.asset(
-                  'assets/imgs/revolver.png',
+                  AppData.currentRevolver,
                   fit: BoxFit.contain,
                 ),
               ),
@@ -194,7 +203,7 @@ Positioned(
     opacity: _sacado ? 1.0 : 0.0,
     duration: Duration(milliseconds: 200),
     child: Image.asset(
-      'assets/imgs/revolver.png',
+      AppData.currentRevolver,
       fit: BoxFit.contain,
     ),
   ),

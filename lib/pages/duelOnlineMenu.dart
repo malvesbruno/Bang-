@@ -1,18 +1,15 @@
-import 'package:bang/main.dart';
 import 'package:bang/pages/amigosPage.dart';
 import 'package:bang/pages/onlineWaitOponentPage.dart';
 import 'package:flutter/material.dart';
-import '../pages/playingPage.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../appdata.dart';
-import '../pages/bluetoothHostPage.dart';
-import '../pages/bluetoothClientPage.dart';
-import '../pages/rankingPage.dart';
-import '../services/enviarConvites.dart';
+import '../services/nuvem.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+
+//Opções para jogar online
 class OnlineDuelMenuPage extends StatefulWidget {
   const OnlineDuelMenuPage({super.key});
 
@@ -21,8 +18,8 @@ class OnlineDuelMenuPage extends StatefulWidget {
 }
 
 class _OnlineDuelMenuPageState extends State<OnlineDuelMenuPage> {
-  final AudioPlayer audioPlayer = AudioPlayer();
-  bool playin = AppData.mute == 0;
+  final AudioPlayer audioPlayer = AudioPlayer();// define a variável que toca áudios
+  bool playin = AppData.mute == 0; // define se o áudio vai tocar
 
   @override
   void initState() {
@@ -33,7 +30,7 @@ class _OnlineDuelMenuPageState extends State<OnlineDuelMenuPage> {
       DeviceOrientation.portraitDown,
     ]);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    playin = AppData.mute == 0;
+    playin = AppData.mute == 0; // define se o áudio vai tocar
   }
 
   @override
