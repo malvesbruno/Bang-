@@ -12,6 +12,13 @@ Bem-vindo ao **Bang!**, pistoleiro. Aqui não há lei, só o duelo e a rapidez d
 - Avatares personalizados aparecem nos cartazes de quem domina o Oeste.  
 - Escolha o visual que combine com seu estilo de pistoleiro.
 
+## 📸 Screenshots
+![Icon do Bang!](./screenshots/icon.png)
+![Turotial do Bang!](./screenshots/tutorial.jpg)
+![VersusPage do Bang!](./screenshots/versusPage.jpg)
+![Store do Bang!](./screenshots/store.gif)
+
+
 ## 🚀 Rodando o Jogo
 
 ```bash
