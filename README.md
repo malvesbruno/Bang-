@@ -16,7 +16,7 @@ Bem-vindo ao **Bang!**, pistoleiro. Aqui não há lei, só o duelo e a rapidez d
 
 ```bash
 # Clone o repositório
-git clone https://github.com/seuusuario/bang.git
+git clone https://github.com/malvesbruno/Bang-.git
 
 # Entre na pasta
 cd bang
@@ -26,3 +26,26 @@ flutter pub get
 
 # Rode o projeto
 flutter run
+```
+
+🛠️ Tecnologias
+
+Flutter / Dart
+
+SQLite para armazenamento local
+
+Firebase (opcional, para ranking online)
+
+📌 Missões Finais
+
+ <input type="checkbox" checked>Sistema de duelos rápidos
+
+ <input type="checkbox" checked>Avatares e revólveres personalizáveis
+
+ <input type="checkbox" checked>Sistema de recompensas progressivas (bounty)
+
+ <input type="checkbox" checked>Modo online PvP
+
+🤠 Nota do Xerife
+
+Atenção: neste deserto, cada bala conta. Treine seus reflexos, aumente seu bounty e lembre-se: só um será o verdadeiro campeão do Bang!
