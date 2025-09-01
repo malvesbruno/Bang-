@@ -1,5 +1,9 @@
 # 🤠 Bang! - O Duelo do Oeste
 
+<p align="center">
+  <img src="./screenshots/icon.png" width="120" alt="Bang! Logo">
+</p>
+
 Bem-vindo ao **Bang!**, pistoleiro. Aqui não há lei, só o duelo e a rapidez do seu gatilho. Mostre quem manda no deserto, ganhe recompensas e torne-se lenda.
 
 ## 🎮 Como Jogar
@@ -13,10 +17,11 @@ Bem-vindo ao **Bang!**, pistoleiro. Aqui não há lei, só o duelo e a rapidez d
 - Escolha o visual que combine com seu estilo de pistoleiro.
 
 ## 📸 Screenshots
-![Icon do Bang!](./screenshots/icon.png)
-![Turotial do Bang!](./screenshots/tutorial.jpg)
-![VersusPage do Bang!](./screenshots/versusPage.jpg)
-![Store do Bang!](./screenshots/store.gif)
+<p align="center">
+  <img src="./screenshots/tutorial.jpg" width="200">
+  <img src="./screenshots/versusPage.jpg" width="200">
+  <img src="./screenshots/store.gif" width="200">
+</p>
 
 
 ## 🚀 Rodando o Jogo
