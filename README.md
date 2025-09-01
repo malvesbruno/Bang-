@@ -46,3 +46,6 @@ flutter run
 ## 🤠 Nota do Xerife
 
 - Atenção: neste deserto, cada bala conta. Treine seus reflexos, aumente seu bounty e lembre-se: só um será o verdadeiro campeão do Bang!
+
+## 📜 Licença
+Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para mais detalhes.
