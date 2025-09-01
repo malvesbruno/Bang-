@@ -1,16 +1,28 @@
-# bang_temp
+# 🤠 Bang! - O Duelo do Oeste
 
-A new Flutter project.
+Bem-vindo ao **Bang!**, pistoleiro. Aqui não há lei, só o duelo e a rapidez do seu gatilho. Mostre quem manda no deserto, ganhe recompensas e torne-se lenda.
 
-## Getting Started
+## 🎮 Como Jogar
+- Cada duelo é uma batalha de reflexos: vença se for mais rápido que seu adversário.  
+- Cada vitória garante **100 golds**, empate **50 golds**.  
+- Use suas recompensas para desbloquear **avatares e revólveres exclusivos**.  
+- O ranking é baseado nas **recompensas acumuladas**: quanto mais duelos, mais prestígio.
 
-This project is a starting point for a Flutter application.
+## 🖼️ Cartazes de Procurado
+- Avatares personalizados aparecem nos cartazes de quem domina o Oeste.  
+- Escolha o visual que combine com seu estilo de pistoleiro.
 
-A few resources to get you started if this is your first Flutter project:
+## 🚀 Rodando o Jogo
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+```bash
+# Clone o repositório
+git clone https://github.com/seuusuario/bang.git
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+# Entre na pasta
+cd bang
+
+# Instale as dependências
+flutter pub get
+
+# Rode o projeto
+flutter run
