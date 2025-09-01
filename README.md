@@ -17,11 +17,17 @@ Bem-vindo ao **Bang!**, pistoleiro. Aqui não há lei, só o duelo e a rapidez d
 - Escolha o visual que combine com seu estilo de pistoleiro.
 
 ## 📸 Screenshots
-<p align="center">
-  <img src="./screenshots/tutorial.jpg" width="200">
-  <img src="./screenshots/versusPage.jpg" width="200">
-  <img src="./screenshots/store.gif" width="200">
-</p>
+<table>
+  <tr>
+    <td>
+      <img src="./screenshots/tutorial.jpg" height="150"/><br>
+      <img src="./screenshots/versusPage.jpg" height="150"/>
+    </td>
+    <td>
+      <img src="./screenshots/store.gif" height="400"/>
+    </td>
+  </tr>
+</table>
 
 
 ## 🚀 Rodando o Jogo
