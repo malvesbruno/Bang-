@@ -36,7 +36,7 @@ flutter run
 
 - Firebase (opcional, para ranking online)
 
-#📌 Missões Finais
+## 📌 Missões Finais
 
 - [x] Sistema de duelos rápidos
 - [x] Avatares e revólveres personalizáveis
