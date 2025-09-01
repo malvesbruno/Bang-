@@ -28,7 +28,7 @@ flutter pub get
 flutter run
 ```
 
-# 🛠️ Tecnologias
+## 🛠️ Tecnologias
 
 - Flutter / Dart
 
@@ -43,6 +43,6 @@ flutter run
 - [x] Sistema de recompensas progressivas (bounty)
 - [x] Modo online PvP
 
-#🤠 Nota do Xerife
+## 🤠 Nota do Xerife
 
 - Atenção: neste deserto, cada bala conta. Treine seus reflexos, aumente seu bounty e lembre-se: só um será o verdadeiro campeão do Bang!
